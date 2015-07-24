@@ -6,7 +6,8 @@ KinematicVariables = cms.PSet(
     eta = cms.string("eta"),
     phi = cms.string("phi"),
     abseta = cms.string("abs(eta)"),
-    charge = cms.string("charge")
+    charge = cms.string("charge"),
+    #nVertices   = cms.InputTag("nverticesModule"),
 )
 IsolationVariables = cms.PSet(
     tkIso  = cms.string("isolationR03.sumPt"),
@@ -193,6 +194,7 @@ HighPtTriggerFlags = cms.PSet(
 
    # 2015 version
    Mu20             = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty()"),
+   L2Mu10             = cms.string("!triggerObjectMatchesByPath('HLT_L2Mu10_v*',0,1).empty()"),
    Mu50             = cms.string("!triggerObjectMatchesByPath('HLT_Mu50_v*',1,0).empty()"),
    Mu45_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu45_eta2p1_v*',1,0).empty()"),
    IsoMu20          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty()"),
@@ -204,6 +206,8 @@ HighPtTriggerFlags = cms.PSet(
    IsoTkMu27        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu27_v*',1,0).empty()"),
    IsoTkMu20_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_eta2p1_v*',1,0).empty()"),
    IsoTkMu24_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu24_eta2p1_v*',1,0).empty()"),
+   Mu17_TkIso       = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_*',1,0).empty()"),
+   Mu8_TkIso       = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_TrkIsoVVL_*',1,0).empty()"),
 
    # To take care of the presence or not of the dz filter, we are requiring three flags for each of the main un-prescaled DoubleMuon Triggers
    # Mu17 leg, Mu8 leg, and (Mu17 leg && fired path)
@@ -224,11 +228,13 @@ HighPtTriggerFlags = cms.PSet(
    #DoubleMu13Mu8NoDZ_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"),
 
    # 2015 version
+   DoubleIsoMu17Mu8_Mu17NoDz = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8').empty()"),
 
+   DoubleIsoMu17TkMu8_Mu17NoDz = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
