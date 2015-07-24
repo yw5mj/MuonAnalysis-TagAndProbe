@@ -17,38 +17,33 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
+
+import FWCore.PythonUtilities.LumiList as LumiList
+import FWCore.ParameterSet.Types as CfgTypes
+import FWCore.ParameterSet.Config as cms
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 
     #run 251168
-    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/168/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
-
-    #run 251244
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/244/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    #run 251251
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/251/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    #run 251252
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/252/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    # to add following runs: 251491, 251493, 251496, ..., 251500 
+    process.GlobalTag.globaltag = cms.string('GR_P_V56')
+    process.source.fileNames = [ 
+                                #"/store/data/Run2015B/SingleMuon/RECO/PromptReco-v1/000/251/244/00000/7EAB9448-4F27-E511-917F-02163E0144CC.root"
+                                theMiniAODfile
+ ]
+ 
+# to add following runs: 251491, 251493, 251496, ..., 251500
     print process.source.fileNames
     #print process.source.fileNames, dataSummary
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
+# get JSON file correctly parced
+JSONfile = 'allRunsAndLumi.json'
+myList = LumiList.LumiList (filename = JSONfile).getCMSSWString().split(',')
+process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange()
+process.source.lumisToProcess.extend(myList)
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
 TRIGGER="SingleMu"
@@ -71,7 +66,7 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 
 
 if TRIGGER == "SingleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu20_v*' )
 elif TRIGGER == "DoubleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
 else:
@@ -200,7 +195,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
-        radialIso = cms.InputTag("radialIso"), 
+        radialIso = cms.InputTag("radialIso"),
+        nVertices   = cms.InputTag("nverticesModule"),
         nSplitTk  = cms.InputTag("splitTrackTagger"),
         #l1rate = cms.InputTag("l1rate"),
         #bx     = cms.InputTag("l1rate","bx"),
@@ -535,4 +531,6 @@ if TRIGGER == "SingleMu":
        process.fakeRateZPlusProbe,
     ])
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data_PromptReco.root"))
+process.TFileService = cms.Service("TFileService", 
+fileName = cms.string("tnpZ_Data_PromptReco.root")
+)

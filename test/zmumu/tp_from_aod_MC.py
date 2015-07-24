@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -21,14 +21,9 @@ import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
     process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0CE0AB97-2E1A-E511-A324-0025905A607E.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0E3FF274-2C1A-E511-9FC5-0025905A60D2.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/68042E12-471B-E511-B16E-0025905A60B4.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/860D8B15-251A-E511-B97A-0025905A612C.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/8A3792A9-141B-E511-8931-0025905A6084.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/A2D65BC4-141B-E511-8A1A-002618943875.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B4DFF255-4A1A-E511-81FA-0025905A48E4.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B6B36157-4A1A-E511-9FFA-003048FF86CA.root'
+                                #  '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0CE0AB97-2E1A-E511-A324-0025905A607E.root',
+                                #theMiniAODfile
+			'/store/group/phys_muon/hbrun/dataCommissioning/DY_AOD/theDY_AODfile_3.root'
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -158,7 +153,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
      #   pt = cms.string("pt"),
      #   eta = cms.string("eta"),
      #   phi = cms.string("phi"),
-     #   nVertices   = cms.InputTag("nverticesModule"),
+#         nVertices   = cms.InputTag("nverticesModule"),
      #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
      #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
      #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
@@ -176,6 +171,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
+        nVertices   = cms.InputTag("nverticesModule")
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -577,9 +573,11 @@ process.RandomNumberGeneratorService.tkTracksNoZ  = cms.PSet( initialSeed = cms.
 process.RandomNumberGeneratorService.tkTracksNoZ0 = cms.PSet( initialSeed = cms.untracked.uint32(81) )
 
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))
+process.TFileService = cms.Service("TFileService",
+                                   fileName = cms.string("tnpZ_MC.root")
+                                   )
 
-if True: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
+if False: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
     import sys
     args = sys.argv[1:]
     if (sys.argv[0] == "cmsRun"): args = sys.argv[2:]
