@@ -33,7 +33,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         eta    = cms.vstring("muon #eta", "-2.5", "2.5", ""),
         abseta = cms.vstring("muon |#eta|", "0", "2.5", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
-        pfCombRelIso04EACorr = cms.vstring("Number of vertices", "0", "999", ""),
+        combRelIsoPF04dBeta = cms.vstring("pf relative isolation", "0", "999", ""),
         SIP = cms.vstring("Number of vertices", "0", "999", ""),
         run = cms.vstring("Number of vertices", "-999", "999999", "")
     ),
@@ -54,7 +54,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         L2fL1sMu16L1f0L2Filtered10Q = cms.vstring("L2fL1sMu16L1f0L2Filtered10Q", "dummy[pass=1,fail=0]"),
 
     ),
-    Cuts = cms.PSet(),
+    Cuts = cms.PSet(
+                combRelIsoPF04dBeta_015 = cms.vstring("combRelIsoPF04dBeta_015", "combRelIsoPF04dBeta", "0.15"),
+    ),
+    Expressions = cms.PSet(
+        IsoMu20_OR_IsoTkMu20 = cms.vstring("IsoMu20_OR_IsoTkMu20", "IsoMu20==1 || IsoTkMu20==1", "IsoMu20", "IsoTkMu20")
+    ),
     PDFs = cms.PSet(
         voigtPlusExpo = cms.vstring(
             "Voigtian::signal(mass, mean[90,80,100], width[2.495], sigma[3,1,20])",
@@ -93,48 +98,41 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
 
 
-
-
 PT_ETA_BINS = cms.PSet(
-                        pt     = cms.vdouble( 0, 10, 15,20,25,30, 40,60, 100 ),
-                        abseta = cms.vdouble(0.0, 0.9, 2.4),
+                        pt     = cms.vdouble( 0, 10, 15,20,25,30, 40, 50, 60, 90, 140, 300, 500  ),
+                        abseta = cms.vdouble(0.0, 0.9, 1.2, 2.1, 2.4),
                         Tight2012 = cms.vstring("pass"),
                         tag_IsoMu20 = cms.vstring("pass"),
-                        tag_pt =  cms.vdouble(25,9999)
+                        tag_pt =  cms.vdouble(23,9999)
 )
 
 ETA_BINS = cms.PSet(
-                       pt     = cms.vdouble( 20, 1000 ),
-                       eta = cms.vdouble(-2.4,-2.1,-1.2,-0.9,0.0,0.9,1.2,2.1, 2.4),
+                       pt     = cms.vdouble( 23, 9999 ),
+                       eta = cms.vdouble(-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2, 0.2, 0.3, 0.6, 0.9, 1.2, 1.6, 2.1, 2.4),
                        Tight2012 = cms.vstring("pass"),
                        tag_IsoMu20 = cms.vstring("pass"),
-                       tag_pt =  cms.vdouble(25,9999)
+                       tag_pt =  cms.vdouble(23,9999)
                        )
 
-PHI_HIGHETA_BINS = cms.PSet(
-                    pt     = cms.vdouble( 20, 1000 ),
-                    phi     = cms.vdouble(-3.1,-2.7,-2.2,-1.8,-1.4,-1.0,-0.6,-0.2,0.2,0.6,1.0,1.4,1.8,2.2,2.7,3.1),
-                    eta = cms.vdouble(1.2,2.1, 2.4),
-                    Tight2012 = cms.vstring("pass"),
-                    tag_IsoMu20 = cms.vstring("pass"),
-                    tag_pt =  cms.vdouble(25,9999)
-                    )
+
 
 PHI_BINS = cms.PSet(
                     phi     = cms.vdouble(-3.1,-2.7,-2.2,-1.8,-1.4,-1.0,-0.6,-0.2,0.2,0.6,1.0,1.4,1.8,2.2,2.7,3.1),
-                       pt     = cms.vdouble( 20, 1000 ),
-                       abseta = cms.vdouble(0.0, 2.4),
-                       Tight2012 = cms.vstring("pass"),
-                       tag_IsoMu20 = cms.vstring("pass"),
-                       tag_pt =  cms.vdouble(25,9999)
-    
-                       )
+                    pt     = cms.vdouble( 23, 9999 ),
+                    abseta = cms.vdouble(0.0, 2.4),
+                    Tight2012 = cms.vstring("pass"),
+                    tag_IsoMu20 = cms.vstring("pass"),
+                    tag_pt =  cms.vdouble(23,9999)
+                    )
 
 VTX_BINS  = cms.PSet(
-    pt     = cms.vdouble(  25, 120 ),
+    pt     = cms.vdouble(  23, 9999 ),
     abseta = cms.vdouble(  0.0, 2.4),
-    tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5,22.5)
+    tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5,22.5,24.5, 28.5, 32.5)
                      #tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,16.5,20.5,25,30,40)
+    Tight2012 = cms.vstring("pass"),
+    tag_IsoMu20 = cms.vstring("pass"),
+    tag_pt =  cms.vdouble(23,9999)
 )
 
 
