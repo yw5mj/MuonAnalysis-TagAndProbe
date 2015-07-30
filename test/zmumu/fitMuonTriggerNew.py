@@ -35,9 +35,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
         pfCombRelIso04EACorr = cms.vstring("Number of vertices", "0", "999", ""),
         SIP = cms.vstring("Number of vertices", "0", "999", ""),
-        run = cms.vstring("Number of vertices", "-999", "999999", ""),
-        HLT_Mu8  = cms.vstring("Mu8 leg",  "-1", "2", ""),
-        HLT_Mu17 = cms.vstring("Mu17 leg", "-1", "2", ""),
+        run = cms.vstring("Number of vertices", "-999", "999999", "")
     ),
 
     Categories = cms.PSet(
@@ -142,10 +140,7 @@ VTX_BINS  = cms.PSet(
 
 
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring(
-                                 #"root://eoscms//eos/cms/store/group/phys_muon/hbrun/dataCommissioning/TnPtrees/tnpZ_withNVtxWeights.root"
-                                 "/tmp/hbrun/tnpZ_withNVtxWeightsFullStatDCS.root"
-                                 ),
+    InputFileNames = cms.vstring(),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_MuonID_%s.root" % scenario),
@@ -154,14 +149,20 @@ process.TnP_MuonID = Template.clone(
 if "_weight" in scenario:
     process.TnP_MuonID.WeightVariable = cms.string("weight")
     process.TnP_MuonID.Variables.weight = cms.vstring("weight","0","10","")
-if scenario=="data":
+if scenario=="data_all":
     process.TnP_MuonID.InputFileNames = cms.vstring(
+                                                    # put here the trees corresponding to data
                                                     #  "root://eoscms//eos/cms/store/group/phys_muon/hbrun/dataCommissioning/TnPtrees/theDataTnP.root",
-                                                    "/tmp/hbrun/theDataTnP_fullStatDCS.root"
+                                                    )
+
+if mc in scenario:
+    process.TnP_MuonID.InputFileNames = cms.vstring(
+                                                    # put here the trees corresponding to mc
+                                                    #  "root://eoscms//eos/cms/store/group/phys_muon/hbrun/dataCommissioning/TnPtrees/theDataTnP.root",
                                                     )
 
 #IDS = [ "IsoMu20","Mu20","L2fL1sMu16L1f0L2Filtered10Q","IsoTkMu20","L1sMu16"]
-IDS = [args[1]]
+IDS = [args[1]] #here the id is taken from the arguments provided to cmsRun 
 ALLBINS = [("pt_eta",PT_ETA_BINS),("phi",PHI_BINS),("eta",ETA_BINS),("vtx",VTX_BINS), ("phiHighEta",PHI_HIGHETA_BINS)]
 
 if len(args) > 1 and args[1] not in IDS: IDS += [ args[1] ]
@@ -172,13 +173,7 @@ for ID in IDS:
         if len(args) > 2 and X not in args[2:]: continue
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         shape = "vpvPlusExpo"
-        #if "eta" in X and not "abseta" in X: shape = "voigtPlusExpo"
-        #if "pt_abseta" in X: shape = "voigtPlusExpo"
-        if "Mu17" in ID and "pt_abseta" in X: B = PT_ETA_BINS_MU17
-        if "Mu8" in ID and "pt_abseta" in X: B = PT_ETA_BINS_MU8
         DEN = B.clone(); num = ID; numstate = "pass"
-        if ID=="Mu20":
-            setattr(DEN,"tag_Mu20",cms.vstring("pass"))
         if "_from_" in ID:
             parts = ID.split("_from_")
             num = parts[0]
@@ -187,28 +182,7 @@ for ID in IDS:
                 elif D == "PFIso25": DEN.pfCombRelIso04EACorr  = cms.vdouble(0,0.25)
                 elif D == "PFIso40": DEN.pfCombRelIso04EACorr  = cms.vdouble(0,0.40)
                 else: setattr(DEN, D, cms.vstring("pass"))
-        numString = cms.vstring()
-        for N in num.split("_and_"):
-            if N == "SIP4":
-                module.Cuts.SIP4 = cms.vstring("SIP4","SIP", "4.0") 
-                numString += [N, "below"]
-            elif N == "PFIso25":
-                module.Cuts.PFIso25 = cms.vstring("PFIso","pfCombRelIso04EACorr", "0.25") 
-                numString += [N, "below"]
-            elif N == "PFIso40":
-                module.Cuts.PFIso40 = cms.vstring("PFIso","pfCombRelIso04EACorr", "0.40") 
-                numString += [N, "below"]
-            elif N in [ "HLT_Mu17", "HLT_Mu8" ]:
-                setattr(module.Cuts, N+"_Pass", cms.vstring(N+"_Pass", N, "0.5")) 
-                numString += [N+"_Pass", "above"]
-            else:
-                numString += [N, "pass"]
-        setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
-            EfficiencyCategoryAndState = numString,
-            UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = DEN,
-            BinToPDFmap = cms.vstring(shape)
-        ))
+
         if scenario.find("mc") != -1:
             setattr(module.Efficiencies, ID+"_"+X+"_mcTrue", cms.PSet(
                 EfficiencyCategoryAndState = numString,
