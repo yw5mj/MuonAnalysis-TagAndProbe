@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 import subprocess
 #dataSummary = open('dataSummary.txt', 'w')
 
+
 process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -23,28 +24,13 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 
-    #run 251168
+    #run 258158
     process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v1')
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/168/00000"
+    sourcefilesfolder = "/store/data/Run2015D/SingleMuon/AOD/PromptReco-v3/000/258/158/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
 
-    #run 251244
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/244/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    #run 251251
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/251/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    #run 251252
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/252/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
-
-    # to add following runs: 251491, 251493, 251496, ..., 251500 
+    # add the following runs as input files: 258158
     print process.source.fileNames
     #print process.source.fileNames, dataSummary
 
@@ -236,6 +222,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
         newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
         newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
+        ## Additional event info
+        bxId     = cms.InputTag("addEventInfo", "bxId"),
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
+
     ),
     pairFlags = cms.PSet(
         BestZ = cms.InputTag("bestPairByZMass"),
@@ -288,6 +278,7 @@ process.tnpSimpleSequence = cms.Sequence(
     #process.l1hltprescale + 
     process.bestPairByZMass + 
     process.newTunePVals +
+    process.addEventInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
@@ -488,6 +479,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.preTkMatchSequenceZ +
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
+        process.nverticesModule +
         process.tpTreeL1
     )
 
@@ -566,3 +558,4 @@ if TRIGGER == "SingleMu":
     ])
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data_PromptReco.root"))
+
