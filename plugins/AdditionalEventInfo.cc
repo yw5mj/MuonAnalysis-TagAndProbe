@@ -42,7 +42,7 @@ private:
   edm::InputTag m_lumiScalerTag;
   edm::InputTag m_pairTag;
 
-  /// Write a ValueMap<float> in the event
+  /// Write a ValueMap<T> in the event
   template<typename T> void writeValueMap(edm::Event &ev, const edm::Handle<edm::View<reco::Candidate> > & handle,
 					  const std::vector<T> & values, const std::string    & label) const ;
 
@@ -54,8 +54,8 @@ AdditionalEventInfo::AdditionalEventInfo(const edm::ParameterSet & iConfig) :
   m_pairTag(iConfig.getParameter<edm::InputTag>("pairTag"))
 {
   
-  produces<edm::ValueMap<int> >("bxId");
-  produces<edm::ValueMap<ULong64_t> >("orbit");
+  produces<edm::ValueMap<float> >("bxId");
+  // produces<edm::ValueMap<ULong64_t> >("orbit");
   produces<edm::ValueMap<float> >("instLumi");
 
 }
@@ -63,15 +63,15 @@ AdditionalEventInfo::AdditionalEventInfo(const edm::ParameterSet & iConfig) :
 void AdditionalEventInfo::produce(edm::Event & ev, const edm::EventSetup & iSetup)
 {
 
-  int bxId  = -999;
-  ULong64_t orbit = 0;
+  float bxId  = -999;
+  // ULong64_t orbit = 0;
 
   float instLumi = -999.;
 
   if (ev.isRealData())
     {
       bxId  = ev.bunchCrossing();
-      orbit = ev.orbitNumber();
+      // orbit = ev.orbitNumber();
 
       if (m_lumiScalerTag.label() != "none")
 	{
@@ -82,15 +82,15 @@ void AdditionalEventInfo::produce(edm::Event & ev, const edm::EventSetup & iSetu
 	    instLumi= lumiScaler->begin()->instantLumi();
 	} 
     } 
-  
+
   edm::Handle<edm::View<reco::Candidate> > pairs;
   ev.getByLabel(m_pairTag, pairs);
 
   size_t n = pairs->size();
   
-  std::vector<int> bxIds(n,0);
-  std::vector<ULong64_t> orbits(n,0);
-  std::vector<float> instLumis(n,0);
+  std::vector<float> bxIds(n,0.);
+  // std::vector<ULong64_t> orbits(n,0);
+  std::vector<float> instLumis(n,0.);
   
   for (size_t iPair = 0; iPair < n; ++iPair)
     {
@@ -99,12 +99,12 @@ void AdditionalEventInfo::produce(edm::Event & ev, const edm::EventSetup & iSetu
 					   "[AdditionalEventInfo::produce] AdditionalEventInfo should be used on composite candidates with two daughters, this one has " << pair.numberOfDaughters() << "\n";
       
       bxIds[iPair]     = bxId;
-      orbits[iPair]    = orbit;
+      //orbits[iPair]    = orbit;
       instLumis[iPair] = instLumi;
     }
 
-  writeValueMap<int>(ev, pairs, bxIds, "bxId");
-  writeValueMap<ULong64_t>(ev, pairs, orbits, "orbit");
+  writeValueMap<float>(ev, pairs, bxIds, "bxId");
+  // writeValueMap<ULong64_t>(ev, pairs, orbits, "orbit");
   writeValueMap<float>(ev, pairs, instLumis, "instLumi");
 
 }

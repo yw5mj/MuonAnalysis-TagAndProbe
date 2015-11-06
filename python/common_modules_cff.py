@@ -227,6 +227,11 @@ genWeightInfo = cms.EDProducer("GenWeightInfo",
     genInfoTag= cms.InputTag("generator")
 )
 
+addEventInfo = cms.EDProducer("AdditionalEventInfo",
+    pairTag= cms.InputTag("tpPairs"),
+    lumiScalerTag= cms.InputTag("scalersRawToDigi")
+)
+
 l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
     probes = cms.InputTag("tagMuons"),
     hltConfig = cms.string("HLT"),
