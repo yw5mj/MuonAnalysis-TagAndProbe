@@ -227,6 +227,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         bx     = cms.InputTag("l1rate","bx"),
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
+	instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -293,6 +294,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.probeMultiplicities + 
     process.l1rate +
     #process.l1hltprescale + 
+    process.addEventInfo +
     process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
