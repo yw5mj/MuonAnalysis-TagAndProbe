@@ -147,6 +147,9 @@ process.TnP_MuonID = Template.clone(
 if "_weight" in scenario:
     process.TnP_MuonID.WeightVariable = cms.string("weight")
     process.TnP_MuonID.Variables.weight = cms.vstring("weight","0","10","")
+else if "_lumiWeight" in scenario:
+        process.TnP_MuonID.WeightVariable = cms.string("lumiWeight")
+        process.TnP_MuonID.Variables.weight = cms.vstring("lumiWeight","0","10","")
 if scenario=="data_all":
     process.TnP_MuonID.InputFileNames = cms.vstring(
                                                     # put here the trees corresponding to data
@@ -199,7 +202,9 @@ for ID in IDS:
             if "_weight" in scenario:
                 getattr(module.Efficiencies, ID+"_"+X          ).UnbinnedVariables.append("weight")
                 getattr(module.Efficiencies, ID+"_"+X+"_mcTrue").UnbinnedVariables.append("weight")
-        setattr(process, "TnP_MuonID_"+ID+"_"+X, module)        
+        if "_lumiWeight" in scenario:
+            getattr(module.Efficiencies, ID+"_"+X          ).UnbinnedVariables.append("lumiWeight")
+        setattr(process, "TnP_MuonID_"+ID+"_"+X, module)
         setattr(process, "run_"+ID+"_"+X, cms.Path(module))
 
 
