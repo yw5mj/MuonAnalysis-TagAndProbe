@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -21,14 +21,7 @@ import os
 if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
     process.source.fileNames = [
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/942C06FC-CC9C-E511-BD1B-0CC47A4D765E.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/A68E95F5-CF9C-E511-9F00-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/CCD157ED-CA9C-E511-A54E-0CC47A78A446.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F44985F2-CA9C-E511-A9F3-0CC47A4C8E2A.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F453A13A-D09C-E511-9A18-0CC47A4D765E.root',
+      'file:/tmp/hbrun/theAOD_DY_76.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -103,6 +96,66 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
     cut = cms.string("track.isNonnull"),  # no real cut now
 )
 
+#####******   HERE I ADD PUPPY
+
+process.load('CommonTools/PileupAlgos/Puppi_cff')
+
+
+
+process.puppiR05 = process.puppi.clone()
+
+process.pfAllPhotonsPuppi = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05"), cut = cms.string("pdgId == 22"))
+process.pfAllNeutralHadronsPuppi = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05"), cut = cms.string("pdgId == 111 || pdgId == 130 || pdgId == 310 || pdgId == 2112"))
+process.pfAllChargedHadronsPuppi = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05"), cut = cms.string("pdgId == 211 || pdgId == -211 || pdgId == 321 || pdgId == -321 || pdgId == 999211 || pdgId == 2212 || pdgId == -2212"))
+
+
+process.pfParticlesForPUPPI = cms.Sequence(process.puppiR05*(process.pfAllPhotonsPuppi + process.pfAllNeutralHadronsPuppi + process.pfAllChargedHadronsPuppi))
+
+
+
+process.packedPFCandidatesNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("particleFlow"), cut = cms.string("abs(pdgId) != 13 && abs(pdgId) != 11 "))
+process.puppiR05NoLep = process.puppiR05.clone(
+                                               candName = 'packedPFCandidatesNoLep'
+                                               )
+
+process.pfAllPhotonsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 22"))
+process.pfAllNeutralHadronsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 111 || pdgId == 130 || pdgId == 310 || pdgId == 2112"))
+process.pfAllChargedHadronsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 211 || pdgId == -211 || pdgId == 321 || pdgId == -321 || pdgId == 999211 || pdgId == 2212 || pdgId == -2212"))
+
+
+from MuonAnalysis.TagAndProbe.common_modules_cff import load_muonPFiso_sequence
+
+muon_src, cone_size = 'probeMuons', 0.4
+
+load_muonPFiso_sequence(process, 'MuonPFIsoSequencePUPPI', algo = 'R04PUPPI',
+                        src = muon_src,
+                        src_charged_hadron = 'pfAllChargedHadronsPuppi',
+                        src_neutral_hadron = 'pfAllNeutralHadronsPuppi',
+                        src_photon         = 'pfAllPhotonsPuppi',
+                        veto_charged_hadron='Threshold(0.0)',
+                        veto_neutral_hadron='Threshold(0.0)',
+                        veto_photon='Threshold(0.0)',
+                        coneR = cone_size
+                        )
+
+load_muonPFiso_sequence(process, 'MuonPFIsoSequencePUPPINoLep', algo = 'R04PUPPINoLep',
+                        src = muon_src,
+                        src_charged_hadron = 'pfAllChargedHadronsPuppiNoLep',
+                        src_neutral_hadron = 'pfAllNeutralHadronsPuppiNoLep',
+                        src_photon         = 'pfAllPhotonsPuppiNoLep',
+                        veto_charged_hadron='Threshold(0.0)',
+                        veto_neutral_hadron='Threshold(0.0)',
+                        veto_photon='Threshold(0.0)',
+                        coneR = cone_size
+                        )
+
+process.loadPUPPIisoInValueMaps = cms.EDProducer("AnyNumbersToValueMaps",
+                                        collection = cms.InputTag("probeMuons"),
+                                        associations = cms.VInputTag(cms.InputTag("muPFIsoValueCHR04PUPPI")),
+                               )
+
+
+
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
     #cut = cms.string('60 < mass < 140 && abs(daughter(0).vz - daughter(1).vz) < 4'),
     cut = cms.string('60 < mass && abs(daughter(0).vz - daughter(1).vz) < 4'),
@@ -140,6 +193,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+        isoPUPPICHR04 = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPI"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
@@ -246,6 +300,9 @@ process.extraProbeVariablesSeq = cms.Sequence(
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
     process.AddPtRatioPtRel
+  + process.pfParticlesForPUPPI
+  + process.MuonPFIsoSequencePUPPI
+  + process.loadPUPPIisoInValueMaps
 )
 
 process.tnpSimpleSequence = cms.Sequence(
