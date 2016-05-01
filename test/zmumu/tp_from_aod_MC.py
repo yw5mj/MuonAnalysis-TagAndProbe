@@ -96,7 +96,7 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
     cut = cms.string("track.isNonnull"),  # no real cut now
 )
 
-#####******   HERE I ADD PUPPY
+############PUPPI Isolation sequence ##################
 
 process.load('CommonTools/PileupAlgos/Puppi_cff')
 
@@ -121,6 +121,9 @@ process.puppiR05NoLep = process.puppiR05.clone(
 process.pfAllPhotonsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 22"))
 process.pfAllNeutralHadronsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 111 || pdgId == 130 || pdgId == 310 || pdgId == 2112"))
 process.pfAllChargedHadronsPuppiNoLep = cms.EDFilter("CandPtrSelector", src = cms.InputTag("puppiR05NoLep"), cut = cms.string("pdgId == 211 || pdgId == -211 || pdgId == 321 || pdgId == -321 || pdgId == 999211 || pdgId == 2212 || pdgId == -2212"))
+
+process.pfParticlesForPUPPINoLep = cms.Sequence(process.packedPFCandidatesNoLep*process.puppiR05NoLep*(process.pfAllPhotonsPuppiNoLep + process.pfAllNeutralHadronsPuppiNoLep + process.pfAllChargedHadronsPuppiNoLep))
+
 
 
 from MuonAnalysis.TagAndProbe.common_modules_cff import load_muonPFiso_sequence
@@ -151,7 +154,7 @@ load_muonPFiso_sequence(process, 'MuonPFIsoSequencePUPPINoLep', algo = 'R04PUPPI
 
 process.loadPUPPIisoInValueMaps = cms.EDProducer("AnyNumbersToValueMaps",
                                         collection = cms.InputTag("probeMuons"),
-                                        associations = cms.VInputTag(cms.InputTag("muPFIsoValueCHR04PUPPI")),
+                                        associations = cms.VInputTag(cms.InputTag("muPFIsoValueCHR04PUPPI"), cms.InputTag("muPFIsoValueNHR04PUPPI"), cms.InputTag("muPFIsoValuePhR04PUPPI"),cms.InputTag("muPFIsoValueCHR04PUPPINoLep"), cms.InputTag("muPFIsoValueNHR04PUPPINoLep"), cms.InputTag("muPFIsoValuePhR04PUPPINoLep")),
                                )
 
 
@@ -193,7 +196,12 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
-        isoPUPPICHR04 = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPI"),
+        muPFIsoValueCHR04PUPPI = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPI"),
+        muPFIsoValueNHR04PUPPI = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueNHR04PUPPI"),
+        muPFIsoValuePhR04PUPPI = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValuePhR04PUPPI"),
+        muPFIsoValueCHR04PUPPINoLep = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPINoLep"),
+        muPFIsoValueNHR04PUPPINoLep = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueNHR04PUPPINoLep"),
+        muPFIsoValuePhR04PUPPINoLep = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValuePhR04PUPPINoLep"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
@@ -299,10 +307,12 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
-  + process.pfParticlesForPUPPI
-  + process.MuonPFIsoSequencePUPPI
-  + process.loadPUPPIisoInValueMaps
+    process.AddPtRatioPtRel +
+    process.pfParticlesForPUPPI +
+    process.pfParticlesForPUPPINoLep +
+    process.MuonPFIsoSequencePUPPI +
+    process.MuonPFIsoSequencePUPPINoLep +
+    process.loadPUPPIisoInValueMaps
 )
 
 process.tnpSimpleSequence = cms.Sequence(
