@@ -126,6 +126,11 @@ process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
+
+from MuonAnalysis.TagAndProbe.puppiIso_cfi import load_fullPFpuppiIsolation
+process.fullPuppIsolationSequence = load_fullPFpuppiIsolation(process)
+from MuonAnalysis.TagAndProbe.puppiIso_cff import PuppiIsolationVariables
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -134,6 +139,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
+        PuppiIsolationVariables,
         MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
@@ -242,7 +248,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
+    process.AddPtRatioPtRel +
+    process.fullPuppIsolationSequence
 )
 
 process.tnpSimpleSequence = cms.Sequence(
@@ -306,6 +313,7 @@ process.staToTkMatchNoZ.maxDeltaR     = 0.3
 process.staToTkMatchNoZ.maxDeltaPtRel = 2.
 
 process.load("MuonAnalysis.TagAndProbe.tracking_reco_info_cff")
+
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
