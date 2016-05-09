@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -21,14 +21,15 @@ import os
 if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
     process.source.fileNames = [
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/942C06FC-CC9C-E511-BD1B-0CC47A4D765E.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/A68E95F5-CF9C-E511-9F00-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/CCD157ED-CA9C-E511-A54E-0CC47A78A446.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F44985F2-CA9C-E511-A9F3-0CC47A4C8E2A.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F453A13A-D09C-E511-9A18-0CC47A4D765E.root',
+                                'file:/tmp/hbrun/theAOD_DY_76.root'
+                                #     '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
+                                #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
+                                #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
+                                #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/942C06FC-CC9C-E511-BD1B-0CC47A4D765E.root',
+                                # '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/A68E95F5-CF9C-E511-9F00-0CC47A4D7668.root',
+                                #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/CCD157ED-CA9C-E511-A54E-0CC47A78A446.root',
+                                #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F44985F2-CA9C-E511-A9F3-0CC47A4C8E2A.root',
+                                # '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F453A13A-D09C-E511-9A18-0CC47A4D765E.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -129,6 +130,11 @@ process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
+
+from MuonAnalysis.TagAndProbe.puppiIso_cfi import load_fullPFpuppiIsolation
+process.fullPuppIsolationSequence = load_fullPFpuppiIsolation(process)
+from MuonAnalysis.TagAndProbe.puppiIso_cff import PuppiIsolationVariables
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -137,6 +143,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
+        PuppiIsolationVariables,
         MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
@@ -155,6 +162,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"), 
         activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
+        ## puppi isolation
+                         #muPFIsoValueCHR04PUPPI = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPI"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -252,7 +261,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.goodGenMuons +
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
-    process.probeMuons * process.probeMuonsMCMatch +
+    process.probeMuons * process.probeMuonsMCMatch * process.fullPuppIsolationSequence +
     process.tpPairs    +
     process.onePair    +
     process.nverticesModule +
@@ -309,6 +318,7 @@ process.staToTkMatchNoZ.maxDeltaR     = 0.3
 process.staToTkMatchNoZ.maxDeltaPtRel = 2.
 
 process.load("MuonAnalysis.TagAndProbe.tracking_reco_info_cff")
+
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
