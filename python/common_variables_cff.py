@@ -8,7 +8,7 @@ KinematicVariables = cms.PSet(
     abseta = cms.string("abs(eta)"),
     charge = cms.string("charge")
 )
-IsolaionVariables = cms.PSet(
+IsolationVariables = cms.PSet(
     tkIso  = cms.string("isolationR03.sumPt"),
     relTkIso  = cms.string("isolationR03.sumPt/pt"),
     ecalIso = cms.string("isolationR03.emEt"),

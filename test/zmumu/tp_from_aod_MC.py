@@ -21,7 +21,7 @@ import os
 if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
     process.source.fileNames = [
-                                'file:/tmp/hbrun/theAOD_DY_76.root'
+                                'file:/tmp/hbrun/theAODfile.root'
                                 #     '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
                                 #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
                                 #'/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
@@ -260,7 +260,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.goodGenMuons +
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
-    process.probeMuons * process.probeMuonsMCMatch
+    process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
     process.onePair    +
     process.nverticesModule +
