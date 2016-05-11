@@ -162,8 +162,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"), 
         activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
-        ## puppi isolation
-                         #muPFIsoValueCHR04PUPPI = cms.InputTag("loadPUPPIisoInValueMaps","muPFIsoValueCHR04PUPPI"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -254,14 +252,15 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
+    process.AddPtRatioPtRel +
+    process.fullPuppIsolationSequence
 )
 
 process.tnpSimpleSequence = cms.Sequence(
     process.goodGenMuons +
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
-    process.probeMuons * process.probeMuonsMCMatch * process.fullPuppIsolationSequence +
+    process.probeMuons * process.probeMuonsMCMatch
     process.tpPairs    +
     process.onePair    +
     process.nverticesModule +

@@ -7,12 +7,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -50,16 +50,7 @@ if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
     process.source.fileNames = [
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/00A3E567-75A8-E511-AD0D-0CC47A4D769E.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/06CC1B3A-FDA7-E511-B02B-00259073E388.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/0A9FEDA2-6DA8-E511-A451-002590596490.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/0AEF074D-EBA7-E511-B229-0002C94CDAF4.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/12998942-7BA8-E511-B1AA-003048FFCB84.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/145E4DB2-EFA7-E511-8E21-00266CF3DFE0.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/148E0F6C-EEA7-E511-A70E-0090FAA588B4.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/149A16F7-6DA8-E511-8A40-003048FFCC0A.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/18D542EB-FAA7-E511-A011-00259073E4E8.root',
-            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
+            'file:/tmp/hbrun/theDataFile.root'
     ]
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
@@ -173,6 +164,10 @@ process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
+from MuonAnalysis.TagAndProbe.puppiIso_cfi import load_fullPFpuppiIsolation
+process.fullPuppIsolationSequence = load_fullPFpuppiIsolation(process)
+from MuonAnalysis.TagAndProbe.puppiIso_cff import PuppiIsolationVariables
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -181,7 +176,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, 
+        PuppiIsolationVariables,
+        MVAIsoVariablesPlain,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
@@ -286,7 +282,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
+    process.AddPtRatioPtRel +
+    process.fullPuppIsolationSequence 
 )
 
 process.tnpSimpleSequence = cms.Sequence(
