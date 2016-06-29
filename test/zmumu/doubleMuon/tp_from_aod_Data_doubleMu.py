@@ -7,12 +7,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -61,18 +61,20 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
     ]
 elif "CMSSW_8_0_"in os.environ['CMSSW_VERSION']:
-
     process.GlobalTag.globaltag = cms.string('80X_dataRun2_Express_v7')
-
-    sourcefilesfolder = "/store/express/Run2016B/ExpressPhysics/FEVT/Express-v1/000/272/818/00000/"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+    process.source.fileNames = [
+   '/store/express/Run2016B/ExpressPhysics/FEVT/Express-v1/000/273/017/00000/020D9800-7717-E611-AF06-02163E0118D6.root',
+   '/store/express/Run2016B/ExpressPhysics/FEVT/Express-v1/000/273/017/00000/025DB7C4-7517-E611-A4C3-02163E01371F.root'
+   ]
+#    sourcefilesfolder = "/store/express/Run2016B/ExpressPhysics/FEVT/Express-v1/000/272/818/00000/"
+#    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+#    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
-TRIGGER="SingleMu"
-#TRIGGER="DoubleMu"
+#TRIGGER="SingleMu"
+TRIGGER="DoubleMu"
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -94,9 +96,10 @@ if TRIGGER == "SingleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu45_eta2p1_v*', 'HLT_Mu50_v*',
                                                                   'HLT_IsoMu27_v*', 'HLT_IsoMu20_v*'  )
 elif TRIGGER == "DoubleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*',
-                                                                  'HLT_Mu8_TrkIsoVVL_v*', 'HLT_Mu17_TrkIsoVVL_v*',
-                                                                  'HLT_Mu17_TkMu8_v*', 'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu17_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*' )
 else:
     raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
 
@@ -159,9 +162,9 @@ process.pseudoTag = cms.EDFilter("MuonSelector",
     cut = cms.string("pt > 15 && isGlobalMuon && numberOfMatchedStations >= 2 && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 )
 if TRIGGER == "DoubleMu":
-    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
-                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
-                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
+    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon ")
+#                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
+#                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
@@ -214,7 +217,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"),
         activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"),
         nSplitTk  = cms.InputTag("splitTrackTagger"),
-        mt  = cms.InputTag("probeMetMt","mt"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -251,8 +253,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
         instLumi = cms.InputTag("addEventInfo", "instLumi"),
-        met = cms.InputTag("tagMetMt","met"),
-        mt  = cms.InputTag("tagMetMt","mt"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -301,7 +301,6 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.probeMetMt + process.tagMetMt +
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
