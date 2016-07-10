@@ -7,7 +7,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.source = cms.Source("PoolSource", 
+process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
@@ -49,18 +49,18 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 )
 process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping)
 
-##    __  __                       
-##   |  \/  |_   _  ___  _ __  ___ 
+##    __  __
+##   |  \/  |_   _  ___  _ __  ___
 ##   | |\/| | | | |/ _ \| '_ \/ __|
 ##   | |  | | |_| | (_) | | | \__ \
 ##   |_|  |_|\__,_|\___/|_| |_|___/
-##                                 
+##
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
 process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     mergeTracks = cms.bool(True),
     mergeCaloMuons = cms.bool(False), # AOD
-    muons     = cms.InputTag("muons"), 
+    muons     = cms.InputTag("muons"),
     caloMuons = cms.InputTag("calomuons"),
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
@@ -141,17 +141,18 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        PtRatio= cms.InputTag("AddPtRatioPtRel","PtRatio"),
-        PtRel= cms.InputTag("AddPtRatioPtRel","PtRel"),
-        radialIso = cms.InputTag("radialIso"), 
-        miniIsoCharged = cms.InputTag("muonMiniIsoCharged","miniIso"), 
-        activity_miniIsoCharged = cms.InputTag("muonMiniIsoCharged","activity"), 
-        miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","miniIso"), 
-        activity_miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","activity"), 
-        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","miniIso"), 
-        activity_miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","activity"), 
-        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"), 
-        activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"), 
+        JetPtRatio= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRatio"),
+        JetPtRel= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRel"),
+        JetNDauCharged= cms.InputTag("AddLeptonJetRelatedVariables","JetNDauCharged"),
+        JetBTagCSV= cms.InputTag("AddLeptonJetRelatedVariables","JetBTagCSV"),
+        miniIsoCharged = cms.InputTag("muonMiniIsoCharged","miniIso"),
+        activity_miniIsoCharged = cms.InputTag("muonMiniIsoCharged","activity"),
+        miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","miniIso"),
+        activity_miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","activity"),
+        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","miniIso"),
+        activity_miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","activity"),
+        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"),
+        activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"),
         nSplitTk  = cms.InputTag("splitTrackTagger"),
         mt  = cms.InputTag("probeMetMt","mt"),
     ),
@@ -162,8 +163,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
-     #   TriggerVariables, 
-     #   MVAIsoVariablesPlainTag, 
+     #   TriggerVariables,
+     #   MVAIsoVariablesPlainTag,
      #   pt = cms.string("pt"),
      #   eta = cms.string("eta"),
      #   phi = cms.string("phi"),
@@ -190,9 +191,9 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-        pt      = cms.string("pt"), 
+        pt      = cms.string("pt"),
         rapidity = cms.string("rapidity"),
-        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
         probeMultiplicity_TMGM = cms.InputTag("probeMultiplicityTMGM"),
         probeMultiplicity_Pt10_M60140 = cms.InputTag("probeMultiplicityPt10M60140"),
@@ -212,7 +213,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
     probeMatches     = cms.InputTag("probeMuonsMCMatch"),
     motherPdgId      = cms.vint32(22, 23),
-    makeMCUnbiasTree       = cms.bool(False), 
+    makeMCUnbiasTree       = cms.bool(False),
     checkMotherInUnbiasEff = cms.bool(True),
     allProbes              = cms.InputTag("probeMuons"),
 )
@@ -226,10 +227,10 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.pfParticleSelectionForIso_cff")
 
 process.miniIsoSeq = cms.Sequence(
     process.pfParticleSelectionForIsoSequence +
-    process.muonMiniIsoCharged + 
-    process.muonMiniIsoPUCharged + 
-    process.muonMiniIsoNeutrals + 
-    process.muonMiniIsoPhotons 
+    process.muonMiniIsoCharged +
+    process.muonMiniIsoPUCharged +
+    process.muonMiniIsoNeutrals +
+    process.muonMiniIsoPhotons
 )
 
 # process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
@@ -237,14 +238,13 @@ process.miniIsoSeq = cms.Sequence(
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
-    process.computeCorrectedIso + 
+    process.computeCorrectedIso +
     process.splitTrackTagger +
-    process.muonDxyPVdzmin + 
+    process.muonDxyPVdzmin +
     process.probeMetMt + process.tagMetMt +
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
-    process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel +
+    process.ak4PFCHSL1FastL2L3CorrectorChain * process.AddLeptonJetRelatedVariables +
     process.fullPuppIsolationSequence
 )
 
@@ -258,27 +258,27 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
-    process.probeMultiplicities + 
-    process.bestPairByZMass + 
+    process.probeMultiplicities +
+    process.bestPairByZMass +
     process.newTunePVals +
     process.genWeightInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
 
-process.tagAndProbe = cms.Path( 
+process.tagAndProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )
 
-##    _____               _    _             
-##   |_   _| __ __ _  ___| | _(_)_ __   __ _ 
+##    _____               _    _
+##   |_   _| __ __ _  ___| | _(_)_ __   __ _
 ##     | || '__/ _` |/ __| |/ / | '_ \ / _` |
 ##     | || | | (_| | (__|   <| | | | | (_| |
 ##     |_||_|  \__,_|\___|_|\_\_|_| |_|\__, |
-##                                     |___/ 
+##                                     |___/
 
 ## Then make another collection for standalone muons, using standalone track to define the 4-momentum
 process.muonsSta = cms.EDProducer("RedefineMuonP4FromTrack",
@@ -315,7 +315,7 @@ process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
     arbitration   = "OneProbe",
     variables = cms.PSet(
-        KinematicVariables, 
+        KinematicVariables,
         StaOnlyVariables,
         ## track matching variables
         tk_deltaR     = cms.InputTag("staToTkMatch","deltaR"),
@@ -334,7 +334,7 @@ process.tpTreeSta = process.tpTree.clone(
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
-        vz = cms.string("vz"), #Z point of closest approach of the track to the beam line 
+        vz = cms.string("vz"), #Z point of closest approach of the track to the beam line
         nVertices = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
@@ -345,9 +345,9 @@ process.tpTreeSta = process.tpTree.clone(
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30ModuleSta"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-        pt      = cms.string("pt"), 
+        pt      = cms.string("pt"),
         rapidity = cms.string("rapidity"),
-        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
     ),
     pairFlags = cms.PSet(),
     allProbes     = "probeMuonsSta",
@@ -377,7 +377,7 @@ if False:
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
-if True: 
+if True:
     process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
       src = cms.InputTag("generalTracks"),
       cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
@@ -401,7 +401,7 @@ if True:
     process.tpTreeSta.variables.tk0_deltaR_NoZ   = cms.InputTag("staToTkMatchNoZ0","deltaR")
     process.tpTreeSta.variables.tk0_deltaEta_NoZ = cms.InputTag("staToTkMatchNoZ0","deltaEta")
 
-process.tagAndProbeSta = cms.Path( 
+process.tagAndProbeSta = cms.Path(
     process.fastFilter +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
@@ -424,7 +424,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
         tagProbePairs = "tpPairsTkGen",
         arbitration   = "OneProbe",
         variables = cms.PSet(
-            KinematicVariables, 
+            KinematicVariables,
             ## track matching variables
             tk_deltaR     = cms.InputTag("genToTkMatch","deltaR"),
             tk_deltaEta   = cms.InputTag("genToTkMatch","deltaEta"),
@@ -452,19 +452,19 @@ if True: # turn on for tracking efficiency using gen particles as probe
         pairVariables = cms.PSet(
             #nJets30 = cms.InputTag("njets30ModuleSta"),
             dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-            pt      = cms.string("pt"), 
+            pt      = cms.string("pt"),
             rapidity = cms.string("rapidity"),
-            deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+            deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
         ),
         pairFlags = cms.PSet(),
         allProbes     = cms.InputTag("probeGen"),
         probeMatches  = cms.InputTag("probeMuonsMCMatchGen"),
     )
-    process.tagAndProbeTkGen = cms.Path( 
+    process.tagAndProbeTkGen = cms.Path(
         process.fastFilter +
         process.probeGen +
-        process.tpPairsTkGen + 
-        process.preTkMatchSequenceZ + 
+        process.tpPairsTkGen +
+        process.preTkMatchSequenceZ +
         process.genToTkMatch + process.genToTkMatchNoZ +
         process.genToTkMatch0 + process.genToTkMatchNoZ0 +
         process.probeMuonsMCMatchGen +
@@ -487,7 +487,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         tagProbePairs = "tpPairsTkL1",
         arbitration   = "OneProbe",
         variables = cms.PSet(
-            KinematicVariables, 
+            KinematicVariables,
             bx = cms.string("bx"),
             quality = cms.string("gmtMuonCand.quality"),
             ## track matching variables
@@ -518,7 +518,7 @@ if True: # turn on for tracking efficiency using L1 seeds
             #nJets30 = cms.InputTag("njets30ModuleSta"),
             pt      = cms.string("pt"),
             rapidity = cms.string("rapidity"),
-            deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+            deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
         ),
         pairFlags = cms.PSet(),
         allProbes     = cms.InputTag("probeL1"),
@@ -537,70 +537,70 @@ if True: # turn on for tracking efficiency using L1 seeds
     )
 
 
-##    _____     _          ____       _            
-##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___ 
+##    _____     _          ____       _
+##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___
 ##   | |_ / _` | |/ / _ \ | |_) / _` | __/ _ \/ __|
 ##   |  _| (_| |   <  __/ |  _ < (_| | ||  __/\__ \
 ##   |_|  \__,_|_|\_\___| |_| \_\__,_|\__\___||___/
-##                                                 
-##   
+##
+##
 process.load("MuonAnalysis.TagAndProbe.fakerate_all_cff")
 
 process.fakeRateJetPlusProbeTree = process.tpTree.clone(
     tagProbePairs = 'jetPlusProbe',
-    arbitration   = 'None', 
+    arbitration   = 'None',
     tagVariables = process.JetPlusProbeTagVariables,
     tagFlags = cms.PSet(),
-    pairVariables = cms.PSet(deltaPhi = cms.string("deltaPhi(daughter(0).phi, daughter(1).phi)")), 
-    pairFlags     = cms.PSet(), 
+    pairVariables = cms.PSet(deltaPhi = cms.string("deltaPhi(daughter(0).phi, daughter(1).phi)")),
+    pairFlags     = cms.PSet(),
     isMC = False, # MC matches not in place for FR yet
 )
 process.fakeRateWPlusProbeTree = process.tpTree.clone(
     tagProbePairs = 'wPlusProbe',
-    arbitration   = 'None', 
+    arbitration   = 'None',
     tagVariables = process.WPlusProbeTagVariables,
     tagFlags = cms.PSet(),
-    pairVariables = cms.PSet(), 
-    pairFlags     = cms.PSet(SameSign = cms.string('daughter(0).daughter(0).charge == daughter(1).charge')), 
+    pairVariables = cms.PSet(),
+    pairFlags     = cms.PSet(SameSign = cms.string('daughter(0).daughter(0).charge == daughter(1).charge')),
     isMC = False, # MC matches not in place for FR yet
 )
 process.fakeRateZPlusProbeTree = process.tpTree.clone(
     tagProbePairs = 'zPlusProbe',
-    arbitration   = 'None', 
+    arbitration   = 'None',
     tagVariables  = process.ZPlusProbeTagVariables,
     tagFlags      = cms.PSet(),
-    pairVariables = cms.PSet(), 
-    pairFlags     = cms.PSet(), 
+    pairVariables = cms.PSet(),
+    pairFlags     = cms.PSet(),
     isMC = False, # MC matches not in place for FR yet
 )
 
 process.fakeRateJetPlusProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
     process.jetPlusProbeSequence +
     process.fakeRateJetPlusProbeTree
 )
 process.fakeRateWPlusProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
     process.wPlusProbeSequence +
     process.fakeRateWPlusProbeTree
 )
 process.fakeRateZPlusProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
     process.zPlusProbeSequence +
     process.fakeRateZPlusProbeTree
 )
 
 process.schedule = cms.Schedule(
-   process.tagAndProbe, 
-   process.tagAndProbeSta, 
-   process.tagAndProbeTkGen, 
-   process.tagAndProbeTkL1, 
+   process.tagAndProbe,
+   process.tagAndProbeSta,
+   process.tagAndProbeTkGen,
+   process.tagAndProbeTkL1,
    process.fakeRateJetPlusProbe,
    process.fakeRateWPlusProbe,
    process.fakeRateZPlusProbe,
@@ -612,7 +612,7 @@ process.RandomNumberGeneratorService.tkTracksNoZ0 = cms.PSet( initialSeed = cms.
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))
 
-if True: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
+if True: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path
     import sys
     args = sys.argv[1:]
     if (sys.argv[0] == "cmsRun"): args = sys.argv[2:]
