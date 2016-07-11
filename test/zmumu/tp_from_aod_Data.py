@@ -71,8 +71,8 @@ elif "CMSSW_8_0_"in os.environ['CMSSW_VERSION']:
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
-TRIGGER="SingleMu"
-#TRIGGER="DoubleMu"
+#TRIGGER="SingleMu"
+TRIGGER="DoubleMu"
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -94,9 +94,10 @@ if TRIGGER == "SingleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu45_eta2p1_v*', 'HLT_Mu50_v*',
                                                                   'HLT_IsoMu27_v*', 'HLT_IsoMu20_v*'  )
 elif TRIGGER == "DoubleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*',
-                                                                  'HLT_Mu8_TrkIsoVVL_v*', 'HLT_Mu17_TrkIsoVVL_v*',
-                                                                  'HLT_Mu17_TkMu8_v*', 'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu17_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*',
+                                                                  'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*' )
 else:
     raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
 
@@ -159,9 +160,7 @@ process.pseudoTag = cms.EDFilter("MuonSelector",
     cut = cms.string("pt > 15 && isGlobalMuon && numberOfMatchedStations >= 2 && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 )
 if TRIGGER == "DoubleMu":
-    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
-                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
-                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
+    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon ")
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
