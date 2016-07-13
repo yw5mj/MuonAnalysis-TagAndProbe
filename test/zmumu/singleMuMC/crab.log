@@ -1,0 +1,70 @@
+DEBUG 2016-07-11 15:38:30,949: 	 Executing command: 'status'
+DEBUG 2016-07-11 15:38:30,951: 	 Found CRAB cache file /afs/cern.ch/user/h/hbrun/.crab3
+DEBUG 2016-07-11 15:38:31,021: 	 Checking credentials
+DEBUG 2016-07-11 15:38:31,021: 	 Proxy file /tmp/x509up_u31764 not found
+DEBUG 2016-07-11 15:38:31,021: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-07-11 15:45:28,375: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 1
+DEBUG 2016-07-11 15:45:28,985: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u31764 -timeleft
+ output : 
+ error: Proxy not found: /tmp/x509up_u31764 (No such file or directory)
+
+ retcode : 1
+ERROR 2016-07-11 15:45:28,985: 	 Error while checking proxy timeleft for /tmp/x509up_u31764
+DEBUG 2016-07-11 15:45:29,494: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u31764 voms-proxy-info -fqan
+ output : 
+ error: Proxy not found: /tmp/x509up_u31764 (No such file or directory)
+
+ retcode : 1
+ERROR 2016-07-11 15:45:29,494: 	 Problems creating proxy.
+ERROR 2016-07-11 15:45:29,495: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 289, in __init__
+    self.proxyCreated = self.proxy.createNewVomsProxySimple(timeLeftThreshold = 720)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/lib/python2.7/site-packages/CRABClient/CredentialInteractions.py", line 152, in createNewVomsProxySimple
+    raise ProxyCreationException("Problems creating proxy.")
+ProxyCreationException: Problems creating proxy.
+DEBUG 2016-07-11 15:45:34,564: 	 Executing command: 'status'
+DEBUG 2016-07-11 15:45:34,565: 	 Found CRAB cache file /afs/cern.ch/user/h/hbrun/.crab3
+DEBUG 2016-07-11 15:45:34,580: 	 Checking credentials
+DEBUG 2016-07-11 15:45:34,581: 	 Proxy file /tmp/x509up_u31764 not found
+DEBUG 2016-07-11 15:45:34,581: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2016-07-11 15:45:38,212: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 1
+DEBUG 2016-07-11 15:45:38,718: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u31764 -timeleft
+ output : 
+ error: Proxy not found: /tmp/x509up_u31764 (No such file or directory)
+
+ retcode : 1
+ERROR 2016-07-11 15:45:38,719: 	 Error while checking proxy timeleft for /tmp/x509up_u31764
+DEBUG 2016-07-11 15:45:39,233: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u31764 voms-proxy-info -fqan
+ output : 
+ error: Proxy not found: /tmp/x509up_u31764 (No such file or directory)
+
+ retcode : 1
+ERROR 2016-07-11 15:45:39,233: 	 Problems creating proxy.
+ERROR 2016-07-11 15:45:39,234: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 289, in __init__
+    self.proxyCreated = self.proxy.createNewVomsProxySimple(timeLeftThreshold = 720)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1606-comp/lib/python2.7/site-packages/CRABClient/CredentialInteractions.py", line 152, in createNewVomsProxySimple
+    raise ProxyCreationException("Problems creating proxy.")
+ProxyCreationException: Problems creating proxy.
